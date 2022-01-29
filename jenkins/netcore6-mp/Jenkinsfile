@@ -1,0 +1,23 @@
+pipeline {
+  agent any
+  stages {
+    stage('clone repository') {
+      steps {
+        sh '''
+git --version'''
+      }
+    }
+
+    stage('Deploy NET Core 6 demo') {
+      steps {
+        withCredentials(bindings: [
+                      string(credentialsId: 'kubernete-jenkis-server-account', variable: 'api_token')
+                      ]) {
+            sh 'kubectl --token $api_token --server https://host.docker.internal:60218 --insecure-skip-tls-verify=true apply -f ./jenkins/deploy-netcore6-mp.yml --force=true'
+          }
+
+        }
+      }
+
+    }
+  }
